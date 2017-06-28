@@ -10,11 +10,11 @@ THREE.OBJLoader = function ( manager ) {
 
 	this.regexp = {
 		// v float float float
-		vertex_pattern           : /^v\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)/,
+		vertex_pattern           : /^v\s+([\d\.\+\-eE]+)\s+([\d\.\+\-eE]+)\s+([\d\.\+\-eE]+)/,
 		// vn float float float
-		normal_pattern           : /^vn\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)/,
+		normal_pattern           : /^vn\s+([\d\.\+\-eE]+)\s+([\d\.\+\-eE]+)\s+([\d\.\+\-eE]+)/,
 		// vt float float
-		uv_pattern               : /^vt\s+([\d|\.|\+|\-|e|E]+)\s+([\d|\.|\+|\-|e|E]+)/,
+		uv_pattern               : /^vt\s+([\d\.\+\-eE]+)\s+([\d\.\+\-eE]+)/,
 		// f vertex vertex vertex
 		face_vertex              : /^f\s+(-?\d+)\s+(-?\d+)\s+(-?\d+)(?:\s+(-?\d+))?/,
 		// f vertex/uv vertex/uv vertex/uv
@@ -43,7 +43,7 @@ THREE.OBJLoader.prototype = {
 
 		var scope = this;
 
-		var loader = new THREE.XHRLoader( scope.manager );
+		var loader = new THREE.FileLoader( scope.manager );
 		loader.setPath( this.path );
 		loader.load( url, function ( text ) {
 
@@ -89,13 +89,13 @@ THREE.OBJLoader.prototype = {
 
 				}
 
+				var previousMaterial = ( this.object && typeof this.object.currentMaterial === 'function' ? this.object.currentMaterial() : undefined );
+
 				if ( this.object && typeof this.object._finalize === 'function' ) {
 
-					this.object._finalize();
+					this.object._finalize( true );
 
 				}
-
-				var previousMaterial = ( this.object && typeof this.object.currentMaterial === 'function' ? this.object.currentMaterial() : undefined );
 
 				this.object = {
 					name : name || '',
@@ -132,16 +132,18 @@ THREE.OBJLoader.prototype = {
 							inherited  : false,
 
 							clone : function( index ) {
-								return {
+								var cloned = {
 									index      : ( typeof index === 'number' ? index : this.index ),
 									name       : this.name,
 									mtllib     : this.mtllib,
 									smooth     : this.smooth,
-									groupStart : this.groupEnd,
+									groupStart : 0,
 									groupEnd   : -1,
 									groupCount : -1,
 									inherited  : false
 								};
+								cloned.clone = this.clone.bind(cloned);
+								return cloned;
 							}
 						};
 
@@ -172,12 +174,25 @@ THREE.OBJLoader.prototype = {
 
 						}
 
+						// Ignore objects tail materials if no face declarations followed them before a new o/g started.
+						if ( end && this.materials.length > 1 ) {
+
+							for ( var mi = this.materials.length - 1; mi >= 0; mi-- ) {
+								if ( this.materials[mi].groupCount <= 0 ) {
+									this.materials.splice( mi, 1 );
+								}
+							}
+
+						}
+
 						// Guarantee at least one empty material, this makes the creation later more straight forward.
-						if ( end !== false && this.materials.length === 0 ) {
+						if ( end && this.materials.length === 0 ) {
+
 							this.materials.push({
 								name   : '',
 								smooth : this.smooth
 							});
+
 						}
 
 						return lastMultiMaterial;
@@ -207,7 +222,7 @@ THREE.OBJLoader.prototype = {
 
 				if ( this.object && typeof this.object._finalize === 'function' ) {
 
-					this.object._finalize();
+					this.object._finalize( true );
 
 				}
 
@@ -412,7 +427,14 @@ THREE.OBJLoader.prototype = {
 		if ( text.indexOf( '\r\n' ) !== - 1 ) {
 
 			// This is faster than String.split with regex that splits on both
-			text = text.replace( '\r\n', '\n' );
+			text = text.replace( /\r\n/g, '\n' );
+
+		}
+
+		if ( text.indexOf( '\\\n' ) !== - 1) {
+
+			// join lines separated by a line continuation character (\)
+			text = text.replace( /\\\n/g, '' );
 
 		}
 
@@ -563,7 +585,10 @@ THREE.OBJLoader.prototype = {
 				// or
 				// g group_name
 
-				var name = result[ 0 ].substr( 1 ).trim();
+				// WORKAROUND: https://bugs.chromium.org/p/v8/issues/detail?id=2869
+				// var name = result[ 0 ].substr( 1 ).trim();
+				var name = ( " " + result[ 0 ].substr( 1 ).trim() ).substr( 1 );
+
 				state.startObject( name );
 
 			} else if ( this.regexp.material_use_pattern.test( line ) ) {
@@ -590,7 +615,18 @@ THREE.OBJLoader.prototype = {
 				// Example asset: examples/models/obj/cerberus/Cerberus.obj
 
 				var value = result[ 1 ].trim().toLowerCase();
-				state.object.smooth = ( value === '1' || value === 'on' );
+				/*
+				 * http://paulbourke.net/dataformats/obj/
+				 * or
+				 * http://www.cs.utah.edu/~boulos/cs3505/obj_spec.pdf
+				 *
+				 * From chapter "Grouping" Syntax explanation "s group_number":
+				 * "group_number is the smoothing group number. To turn off smoothing groups, use a value of 0 or off.
+				 * Polygonal elements use group numbers to put elements in different smoothing groups. For free-form
+				 * surfaces, smoothing groups are either turned on or off; there is no difference between values greater
+				 * than 0."
+				 */
+				state.object.smooth = ( value !== '0' && value !== 'off' );
 
 				var material = state.object.currentMaterial();
 				if ( material ) {
@@ -695,12 +731,11 @@ THREE.OBJLoader.prototype = {
 
 				}
 
-				var multiMaterial = new THREE.MultiMaterial( createdMaterials );
-				mesh = ( ! isLine ? new THREE.Mesh( buffergeometry, multiMaterial ) : new THREE.Line( buffergeometry, multiMaterial ) );
+				mesh = ( ! isLine ? new THREE.Mesh( buffergeometry, createdMaterials ) : new THREE.LineSegments( buffergeometry, createdMaterials ) );
 
 			} else {
 
-				mesh = ( ! isLine ? new THREE.Mesh( buffergeometry, createdMaterials[ 0 ] ) : new THREE.Line( buffergeometry, createdMaterials[ 0 ] ) );
+				mesh = ( ! isLine ? new THREE.Mesh( buffergeometry, createdMaterials[ 0 ] ) : new THREE.LineSegments( buffergeometry, createdMaterials[ 0 ] ) );
 			}
 
 			mesh.name = object.name;

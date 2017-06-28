@@ -30,7 +30,8 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - Backgrounds: ClearPass, TexturePass and CubeTexturePass by <a href="https://clara.io" target="_blank">Ben Houston</a></div>
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Backgrounds: ClearPass, TexturePass and CubeTexturePass by <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a>
+		</div>
 
 		<div id="container"></div>
 
@@ -69,7 +70,7 @@
 				cubeTexturePass: true,
 				cubeTexturePassOpacity: 1.0,
 
-				renderPass: true,
+				renderPass: true
 
 				//autoRotate: true,
 
@@ -110,7 +111,7 @@
 
 			function init() {
 
-				container = document.getElementById( "container" );
+				var container = document.getElementById( "container" );
 
 				var width = window.innerWidth || 1;
 				var height = window.innerHeight || 1;
@@ -140,7 +141,7 @@
 
 				scene = new THREE.Scene();
 
-				group = new THREE.Object3D();
+				var group = new THREE.Group();
 				scene.add( group );
 
 				var light = new THREE.PointLight( 0xddffdd, 1.0 );
@@ -190,14 +191,14 @@
 				composer.addPass( texturePass );
 
 				var textureLoader = new THREE.TextureLoader();
-				textureLoader.load( "../examples/textures/hardwood2_diffuse.jpg", function( map ) {
+				textureLoader.load( "textures/hardwood2_diffuse.jpg", function( map ) {
 					texturePass.map = map;
 				});
 
 				cubeTexturePassP = new THREE.CubeTexturePass( cameraP );
 				composer.addPass( cubeTexturePassP );
 
-				var ldrUrls = genCubeUrls( "./textures/cube/pisa/", ".png" );
+				var ldrUrls = genCubeUrls( "textures/cube/pisa/", ".png" );
 				new THREE.CubeTextureLoader().load( ldrUrls, function ( ldrCubeMap ) {
 					cubeTexturePassP.envMap = ldrCubeMap;
 					console.log( "loaded envmap");
@@ -207,7 +208,7 @@
 				renderPass.clear = false;
 				composer.addPass( renderPass );
 
-				copyPass = new THREE.ShaderPass( THREE.CopyShader );
+				var copyPass = new THREE.ShaderPass( THREE.CopyShader );
 				copyPass.renderToScreen = true;
 				composer.addPass( copyPass );
 
@@ -279,6 +280,5 @@
 			}
 
 		</script>
-		<div>
 	</body>
 </html>

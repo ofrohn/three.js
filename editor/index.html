@@ -9,13 +9,15 @@
 		<link href="css/main.css" rel="stylesheet" />
 		<link id="theme" href="css/light.css" rel="stylesheet" />
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="../examples/js/libs/system.min.js"></script>
 
 		<script src="../examples/js/controls/EditorControls.js"></script>
 		<script src="../examples/js/controls/TransformControls.js"></script>
 
 		<script src="../examples/js/libs/jszip.min.js"></script>
+		<script src="../examples/js/libs/inflate.min.js"></script> <!-- FBX -->
+
 		<script src="../examples/js/loaders/AMFLoader.js"></script>
 		<script src="../examples/js/loaders/AWDLoader.js"></script>
 		<script src="../examples/js/loaders/BabylonLoader.js"></script>
@@ -29,6 +31,7 @@
 		<script src="../examples/js/loaders/PLYLoader.js"></script>
 		<script src="../examples/js/loaders/STLLoader.js"></script>
 		<script src="../examples/js/loaders/TGALoader.js"></script>
+		<script src="../examples/js/loaders/TDSLoader.js"></script>
 		<script src="../examples/js/loaders/UTF8Loader.js"></script>
 		<script src="../examples/js/loaders/VRMLLoader.js"></script>
 		<script src="../examples/js/loaders/VTKLoader.js"></script>
@@ -37,8 +40,6 @@
 		<script src="../examples/js/loaders/ctm/CTMLoader.js"></script>
 		<script src="../examples/js/exporters/OBJExporter.js"></script>
 		<script src="../examples/js/exporters/STLExporter.js"></script>
-
-		<script src="../examples/js/loaders/deprecated/SceneLoader.js"></script>
 
 		<script src="../examples/js/renderers/Projector.js"></script>
 		<script src="../examples/js/renderers/CanvasRenderer.js"></script>
@@ -84,7 +85,7 @@
 
 		<script src="../examples/js/effects/VREffect.js"></script>
 		<script src="../examples/js/controls/VRControls.js"></script>
-		<script src="../examples/js/WebVR.js"></script>
+		<script src="../examples/js/vr/WebVR.js"></script>
 
 		<script src="js/Storage.js"></script>
 
@@ -97,8 +98,8 @@
 		<script src="js/Menubar.Edit.js"></script>
 		<script src="js/Menubar.Add.js"></script>
 		<script src="js/Menubar.Play.js"></script>
-		<script src="js/Menubar.View.js"></script>
-		<!-- <script src="js/Menubar.Examples.js"></script> -->
+		<!-- <script src="js/Menubar.View.js"></script> -->
+		<script src="js/Menubar.Examples.js"></script>
 		<script src="js/Menubar.Help.js"></script>
 		<script src="js/Menubar.Status.js"></script>
 		<script src="js/Sidebar.js"></script>
@@ -129,6 +130,7 @@
 		<script src="js/Toolbar.js"></script>
 		<script src="js/Viewport.js"></script>
 		<script src="js/Viewport.Info.js"></script>
+
 		<script src="js/Command.js"></script>
 		<script src="js/commands/AddObjectCommand.js"></script>
 		<script src="js/commands/RemoveObjectCommand.js"></script>
@@ -253,6 +255,8 @@
 				signals.objectChanged.add( saveState );
 				signals.objectRemoved.add( saveState );
 				signals.materialChanged.add( saveState );
+				signals.sceneBackgroundChanged.add( saveState );
+				signals.sceneFogChanged.add( saveState );
 				signals.sceneGraphChanged.add( saveState );
 				signals.scriptChanged.add( saveState );
 				signals.historyChanged.add( saveState );
@@ -362,7 +366,7 @@
 
 				if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
 
-					var loader = new THREE.XHRLoader();
+					var loader = new THREE.FileLoader();
 					loader.crossOrigin = '';
 					loader.load( file, function ( text ) {
 
