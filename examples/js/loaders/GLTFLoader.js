@@ -1619,6 +1619,11 @@ THREE.GLTFLoader = ( function () {
 
 				pending.push( parser.assignTexture( materialParams, 'normalMap', material.normalTexture.index ) );
 
+				if ( material.normalTexture.scale ) {
+
+					materialParams.normalScale = new THREE.Vector2( material.normalTexture.scale, material.normalTexture.scale );
+
+				}
 			}
 
 			if ( material.occlusionTexture !== undefined ) {
@@ -1679,7 +1684,7 @@ THREE.GLTFLoader = ( function () {
 
 				// Normal map textures use OpenGL conventions:
 				// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#materialnormaltexture
-				_material.normalScale.x = -1;
+				_material.normalScale.x = -_material.normalScale.x;
 
 				if ( material.extras ) _material.userData = material.extras;
 
