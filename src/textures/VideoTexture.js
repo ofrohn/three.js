@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { Texture } from './Texture';
+import { Texture } from './Texture.js';
 
 function VideoTexture( video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
@@ -10,26 +10,27 @@ function VideoTexture( video, mapping, wrapS, wrapT, magFilter, minFilter, forma
 
 	this.generateMipmaps = false;
 
-	var scope = this;
+}
 
-	function update() {
+VideoTexture.prototype = Object.assign( Object.create( Texture.prototype ), {
+
+	constructor: VideoTexture,
+
+	isVideoTexture: true,
+
+	update: function () {
+
+		var video = this.image;
 
 		if ( video.readyState >= video.HAVE_CURRENT_DATA ) {
 
-			scope.needsUpdate = true;
+			this.needsUpdate = true;
 
 		}
 
-		requestAnimationFrame( update );
-
 	}
 
-	requestAnimationFrame( update );
-
-}
-
-VideoTexture.prototype = Object.create( Texture.prototype );
-VideoTexture.prototype.constructor = VideoTexture;
+} );
 
 
 export { VideoTexture };

@@ -107,8 +107,7 @@
 		<h3>[property:array lineDistances]</h3>
 		<div>
 		An array containing distances between vertices for Line geometries.
-		This is required for [page:LineSegments] / [page:LineDashedMaterial] to render correctly.
-		Line distances can be generated automatically with [page:.computeLineDistances].
+		This is required for [page:LineDashedMaterial] to render correctly.
 		</div>
 
 		<h3>[property:Array morphTargets]</h3>
@@ -159,8 +158,8 @@
 		In code another example could look like this:
 		<code>
 		// e.g.
-		geometry.skinIndices[15] = new THREE.Vector4(   0,   5,   9, 0 );
-		geometry.skinWeights[15] = new THREE.Vector4( 0.2, 0.5, 0.3, 0 );
+		geometry.skinIndices[15] = new THREE.Vector4(   0,   5,   9, 10 );
+		geometry.skinWeights[15] = new THREE.Vector4( 0.2, 0.5, 0.3,  0 );
 
 		// corresponds with the following vertex
 		geometry.vertices[15];
@@ -242,9 +241,6 @@
 		<h3>[method:null computeFlatVertexNormals]()</h3>
 		<div>Computes flat [page:Face3.vertexNormals vertex normals]. Sets the vertex normal of each vertex of each face to be the same as the face's normal.</div>
 
-		<h3>[method:null computeLineDistances]()</h3>
-		<div>Compute [page:.lineDistances].</div>
-
 		<h3>[method:null computeMorphNormals]()</h3>
 		<div>Computes [page:.morphNormals].</div>
 
@@ -274,7 +270,7 @@
 		<div>
 		vector - A world vector to look at.<br /><br />
 
-		Rotates the geometry to face point in space. This is typically done as a one time operation, and not during a loop
+		Rotates the geometry to face point in space. This is typically done as a one time operation but not during the render loop.<br>
 		Use [page:Object3D.lookAt] for typical real-time mesh usage.
 		</div>
 
@@ -299,31 +295,34 @@
 
 		<h3>[method:Geometry rotateX] ( [page:Float radians] )</h3>
 		<div>
-		Rotate the geometry about the X axis. This is typically done as a one time operation, and not during a loop
-    Use [page:Object3D.rotation] for typical real-time mesh rotation.
+		Rotate the geometry about the X axis. This is typically done as a one time operation but not during the render loop.<br>
+		Use [page:Object3D.rotation] for typical real-time mesh rotation.
 		</div>
 
 		<h3>[method:Geometry rotateY] ( [page:Float radians] )</h3>
 		<div>
-		Rotate the geometry about the Y axis. This is typically done as a one time operation, and not during a loop
-    Use [page:Object3D.rotation] for typical real-time mesh rotation.
+		Rotate the geometry about the Y axis. This is typically done as a one time operation but not during the render loop.<br>
+    	        Use [page:Object3D.rotation] for typical real-time mesh rotation.
 		</div>
 
 		<h3>[method:Geometry rotateZ] ( [page:Float radians] )</h3>
 		<div>
-		Rotate the geometry about the Z axis. This is typically done as a one time operation, and not during a loop
-    Use [page:Object3D.rotation] for typical real-time mesh rotation.
+		Rotate the geometry about the Z axis. This is typically done as a one time operation but not during the render loop.<br>
+	        Use [page:Object3D.rotation] for typical real-time mesh rotation.
 		</div>
+
+		<h3>[method:Geometry setFromPoints] ( [page:Array points] )</h3>
+		<div>Sets the vertices for this Geometry from an array of points.</div>
 
 		<h3>[method:null sortFacesByMaterialIndex] (  )</h3>
 		<div>
-			Sorts the faces array according to material index. For complex geometries with several materials,
-			this can result in reduced draw call and improved performance.
+		Sorts the faces array according to material index. For complex geometries with several materials,
+		this can result in reduced draw calls and improved performance.
 		</div>
 
 		<h3>[method:Geometry scale] ( [page:Float x], [page:Float y], [page:Float z] )</h3>
 		<div>
-		Scale the geometry data. This is typically done as a one time operation, and not during a loop
+		Scale the geometry data. This is typically done as a one time operation but not during the render loop.<br>
 		Use [page:Object3D.scale] for typical real-time mesh scaling.
 		</div>
 
@@ -332,8 +331,8 @@
 
 		<h3>[method:Geometry translate] ( [page:Float x], [page:Float y], [page:Float z] )</h3>
 		<div>
-		Translate the geometry. This is typically done as a one time operation, and not during a loop
-    Use [page:Object3D.position] for typical real-time mesh translation.
+		Translate the geometry. This is typically done as a one time operation but not during the render loop.<br>
+    	        Use [page:Object3D.position] for typical real-time mesh translation.
 		</div>
 
 

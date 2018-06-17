@@ -4,11 +4,20 @@
  * @author szimek / https://github.com/szimek/
  */
 
+<<<<<<< Updated upstream
 import { EventDispatcher } from '../core/EventDispatcher';
 import { UVMapping } from '../constants';
 import { MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, LinearEncoding, UnsignedByteType, RGBAFormat, LinearMipMapLinearFilter, LinearFilter } from '../constants';
 import { _Math } from '../math/Math';
 import { Vector2 } from '../math/Vector2';
+=======
+import { EventDispatcher } from '../core/EventDispatcher.js';
+import { UVMapping } from '../constants.js';
+import { MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, LinearEncoding, UnsignedByteType, RGBAFormat, LinearMipMapLinearFilter, LinearFilter } from '../constants.js';
+import { _Math } from '../math/Math.js';
+import { Vector2 } from '../math/Vector2.js';
+import { Matrix3 } from '../math/Matrix3.js';
+>>>>>>> Stashed changes
 
 var textureId = 0;
 
@@ -38,6 +47,7 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 
 	this.offset = new Vector2( 0, 0 );
 	this.repeat = new Vector2( 1, 1 );
+	this.center = new Vector2( 0, 0 );
 	this.rotation = 0;
 	this.center = new Vector2( 0, 0 );
 
@@ -60,17 +70,7 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 Texture.DEFAULT_IMAGE = undefined;
 Texture.DEFAULT_MAPPING = UVMapping;
 
-Object.defineProperty( Texture.prototype, "needsUpdate", {
-
-	set: function ( value ) {
-
-		if ( value === true ) this.version ++;
-
-	}
-
-} );
-
-Object.assign( Texture.prototype, EventDispatcher.prototype, {
+Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 	constructor: Texture,
 
@@ -104,6 +104,7 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 
 		this.offset.copy( source.offset );
 		this.repeat.copy( source.repeat );
+		this.center.copy( source.center );
 		this.rotation = source.rotation;
 		this.center.copy( source.center );
 
@@ -119,7 +120,9 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 
 	toJSON: function ( meta ) {
 
-		if ( meta.textures[ this.uuid ] !== undefined ) {
+		var isRootObject = ( meta === undefined || typeof meta === 'string' );
+
+		if ( ! isRootObject && meta.textures[ this.uuid ] !== undefined ) {
 
 			return meta.textures[ this.uuid ];
 
@@ -179,6 +182,7 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 
 			repeat: [ this.repeat.x, this.repeat.y ],
 			offset: [ this.offset.x, this.offset.y ],
+			center: [ this.center.x, this.center.y ],
 			rotation: this.rotation,
 			center: [ this.center.x, this.center.y ],
 			wrap: [ this.wrapS, this.wrapT ],
@@ -202,7 +206,7 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 
 			}
 
-			if ( meta.images[ image.uuid ] === undefined ) {
+			if ( ! isRootObject && meta.images[ image.uuid ] === undefined ) {
 
 				meta.images[ image.uuid ] = {
 					uuid: image.uuid,
@@ -215,7 +219,11 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 
 		}
 
-		meta.textures[ this.uuid ] = output;
+		if ( ! isRootObject ) {
+
+			meta.textures[ this.uuid ] = output;
+
+		}
 
 		return output;
 
@@ -301,6 +309,16 @@ Object.assign( Texture.prototype, EventDispatcher.prototype, {
 			uv.y = 1 - uv.y;
 
 		}
+
+	}
+
+} );
+
+Object.defineProperty( Texture.prototype, "needsUpdate", {
+
+	set: function ( value ) {
+
+		if ( value === true ) this.version ++;
 
 	}
 

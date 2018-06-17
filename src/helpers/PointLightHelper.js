@@ -7,6 +7,13 @@ import { SphereBufferGeometry } from '../geometries/SphereGeometry';
  * @author mrdoob / http://mrdoob.com/
  */
 
+<<<<<<< Updated upstream
+=======
+import { Mesh } from '../objects/Mesh.js';
+import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
+import { SphereBufferGeometry } from '../geometries/SphereGeometry.js';
+
+>>>>>>> Stashed changes
 function PointLightHelper( light, sphereSize, color ) {
 
 	this.light = light;

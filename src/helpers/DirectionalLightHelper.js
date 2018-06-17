@@ -1,9 +1,24 @@
+<<<<<<< Updated upstream
 import { Vector3 } from '../math/Vector3';
 import { Object3D } from '../core/Object3D';
 import { Line } from '../objects/Line';
 import { Float32BufferAttribute } from '../core/BufferAttribute';
 import { BufferGeometry } from '../core/BufferGeometry';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial';
+=======
+/**
+ * @author alteredq / http://alteredqualia.com/
+ * @author mrdoob / http://mrdoob.com/
+ * @author WestLangley / http://github.com/WestLangley
+ */
+
+import { Vector3 } from '../math/Vector3.js';
+import { Object3D } from '../core/Object3D.js';
+import { Line } from '../objects/Line.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
+>>>>>>> Stashed changes
 
 /**
  * @author alteredq / http://alteredqualia.com/
@@ -27,11 +42,11 @@ function DirectionalLightHelper( light, size, color ) {
 
 	var geometry = new BufferGeometry();
 	geometry.addAttribute( 'position', new Float32BufferAttribute( [
-		- size,   size, 0,
-		  size,   size, 0,
-		  size, - size, 0,
+		- size, size, 0,
+		size, size, 0,
+		size, - size, 0,
 		- size, - size, 0,
-		- size,   size, 0
+		- size, size, 0
 	], 3 ) );
 
 	var material = new LineBasicMaterial( { fog: false } );
