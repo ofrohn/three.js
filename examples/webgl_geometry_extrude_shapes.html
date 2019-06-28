@@ -4,12 +4,10 @@
 		<title>three.js webgl - geometry - extrude shapes</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family: Monospace;
 				background-color: #222;
-				margin: 0px;
-				overflow: hidden;
 			}
 			a {
 				color: #f80;
@@ -23,8 +21,6 @@
 		<script src="js/controls/TrackballControls.js"></script>
 
 		<script>
-
-			var container;
 
 			var camera, scene, renderer, controls;
 
@@ -67,11 +63,11 @@
 				//
 
 				var closedSpline = new THREE.CatmullRomCurve3( [
-					new THREE.Vector3( -60, -100,  60 ),
-					new THREE.Vector3( -60,   20,  60 ),
-					new THREE.Vector3( -60,  120,  60 ),
-					new THREE.Vector3(  60,   20, -60 ),
-					new THREE.Vector3(  60, -100, -60 )
+					new THREE.Vector3( - 60, - 100, 60 ),
+					new THREE.Vector3( - 60, 20, 60 ),
+					new THREE.Vector3( - 60, 120, 60 ),
+					new THREE.Vector3( 60, 20, - 60 ),
+					new THREE.Vector3( 60, - 100, - 60 )
 				] );
 
 				closedSpline.curveType = 'catmullrom';
@@ -92,13 +88,13 @@
 
 					var a = 2 * i / count * Math.PI;
 
-					pts.push( new THREE.Vector2 ( Math.cos( a ) * l, Math.sin( a ) * l ) );
+					pts.push( new THREE.Vector2( Math.cos( a ) * l, Math.sin( a ) * l ) );
 
 				}
 
 				var shape = new THREE.Shape( pts );
 
-				var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+				var geometry = new THREE.ExtrudeBufferGeometry( shape, extrudeSettings );
 
 				var material = new THREE.MeshLambertMaterial( { color: 0xb00000, wireframe: false } );
 
@@ -118,7 +114,7 @@
 
 				}
 
-				var randomSpline =  new THREE.CatmullRomCurve3( randomPoints );
+				var randomSpline = new THREE.CatmullRomCurve3( randomPoints );
 
 				//
 
@@ -137,13 +133,13 @@
 
 					var a = i / numPts * Math.PI;
 
-					pts.push( new THREE.Vector2 ( Math.cos( a ) * l, Math.sin( a ) * l ) );
+					pts.push( new THREE.Vector2( Math.cos( a ) * l, Math.sin( a ) * l ) );
 
 				}
 
 				var shape = new THREE.Shape( pts );
 
-				var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+				var geometry = new THREE.ExtrudeBufferGeometry( shape, extrudeSettings );
 
 				var material2 = new THREE.MeshLambertMaterial( { color: 0xff8000, wireframe: false } );
 
@@ -157,17 +153,15 @@
 				var materials = [ material, material2 ];
 
 				var extrudeSettings = {
-					amount: 20,
+					depth: 20,
 					steps: 1,
-					material: 1,
-					extrudeMaterial: 0,
 					bevelEnabled: true,
-					bevelThickness : 2,
+					bevelThickness: 2,
 					bevelSize: 4,
 					bevelSegments: 1
 				};
 
-				var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+				var geometry = new THREE.ExtrudeBufferGeometry( shape, extrudeSettings );
 
 				var mesh = new THREE.Mesh( geometry, materials );
 

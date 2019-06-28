@@ -1714,54 +1714,6 @@
       "!doc": "A loader for loading an [page:Image].",
       "!type": "fn(manager: +THREE.LoadingManager)"
     },
-    "JSONLoader": {
-      "!url": "http://threejs.org/docs/#Reference/loaders/JSONLoader",
-      "prototype": {
-        "!proto": "THREE.Loader.prototype",
-        "withCredentials": {
-          "!type": "boolean",
-          "!doc": "If true, the ajax request will use cookies."
-        },
-        "onLoadStart": {
-          "!type": "function",
-          "!doc": "The default is a function with empty body."
-        },
-        "onLoadComplete": {
-          "!type": "function",
-          "!doc": "The default is a function with empty body."
-        },
-        "load": {
-          "!type": "fn(url: string, callback: function, texturePath: string)",
-          "!doc": "[page:String url] — required<br>\n\t\t[page:Function callback] — required. Will be called when load completes. The arguments will be the loaded [page:Object3D] and the loaded [page:Array materials].<br>\n\t\t[page:String texturePath] — optional. If not specified, textures will be assumed to be in the same folder as the Javascript model file."
-        },
-        "loadAjaxJSON": {
-          "!type": "fn(context: +THREE.JSONLoader, url: string, callback: function, texturePath: string, callbackProgress: function)",
-          "!doc": "Begin loading from url and call <em>callback</em> with the parsed response content."
-        },
-        "parse": {
-          "!type": "fn(json: object, texturePath: string) -> +THREE.Object3D",
-          "!doc": "Parse a <em>JSON</em> structure and return an [page:Object] containing the parsed .[page:Geometry] and .[page:Array materials]."
-        },
-        "updateProgress": {
-          "!type": "fn(progress: object)",
-          "!doc": "Updates the DOM object with the progress made."
-        },
-        "createMaterial": {
-          "!type": "fn(m: object, texturePath: string) -> +THREE.Material",
-          "!doc": "Creates the Material based on the parameters m."
-        },
-        "initMaterials": {
-          "!type": "fn(materials: [], texturePath: string) -> []",
-          "!doc": "Creates an array of [page:Material] based on the array of parameters m. The index of the parameters decide the correct index of the materials."
-        },
-        "extractUrlBase": {
-          "!type": "fn(url: string) -> string",
-          "!doc": "Extract the base from the URL."
-        }
-      },
-      "!doc": "A loader for loading objects in JSON format.",
-      "!type": "fn()"
-    },
     "Loader": {
       "!url": "http://threejs.org/docs/#Reference/loaders/Loader",
       "prototype": {
@@ -1836,7 +1788,7 @@
           "!doc": "Parse a <em>mtl</em> text structure and return a [page:MTLLoaderMaterialCreator] instance.<br>"
         }
       },
-      "!doc": "A loader for loading an <em>.mtl</em> resource, used internaly by [page:OBJMTLLoader] and [page:UTF8Loader].",
+      "!doc": "A loader for loading an <em>.mtl</em> resource, used internaly by [page:OBJLoader].",
       "!type": "fn(baseUrl: string, options: object, crossOrigin: string)"
     },
     "MaterialLoader": {
@@ -1904,7 +1856,7 @@
           "!doc": "[page:String value] — The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS."
         }
       },
-      "!doc": "A loader for loading a JSON resource. Unlike the [page:JSONLoader], this one make use of the <em>.type</em> attributes of objects to map them to their original classes.",
+      "!doc": "A loader for loading a JSON resource.",
       "!type": "fn(manager: +THREE.LoadingManager)"
     },
     "PDBLoader": {
@@ -3702,11 +3654,11 @@
           "!type": "fn(a: +THREE.Vector3, b: +THREE.Vector3, c: +THREE.Vector3) -> +THREE.Triangle",
           "!doc": "Sets the triangle's vectors to the passed vectors."
         },
-        "normal": {
+        "getNormal": {
           "!type": "fn(optionalTarget: +THREE.Vector3) -> +THREE.Vector3",
           "!doc": "Return the calculated normal of the triangle."
         },
-        "barycoordFromPoint": {
+        "getBarycoord": {
           "!type": "fn(point: +THREE.Vector3, optionalTarget: +THREE.Vector3) -> +THREE.Vector3",
           "!doc": "Return a barycentric coordinate from the given vector. <br><br>\n\t\t[link:http://commons.wikimedia.org/wiki/File:Barycentric_coordinates_1.png](Picture of barycentric coordinates)"
         },
@@ -3714,11 +3666,11 @@
           "!type": "fn() -> +THREE.Triangle",
           "!doc": "Return a new copy of this triangle."
         },
-        "area": {
+        "getArea": {
           "!type": "fn() -> number",
           "!doc": "Return the area of the triangle."
         },
-        "midpoint": {
+        "getMidpoint": {
           "!type": "fn(optionalTarget: +THREE.Vector3) -> +THREE.Vector3",
           "!doc": "Return the midpoint of the triangle. Optionally sets a target vector."
         },
@@ -3726,7 +3678,7 @@
           "!type": "fn(triangle: +THREE.Triangle) -> bool",
           "!doc": "Checks to see if two triangles are equal (share the same vectors)."
         },
-        "plane": {
+        "getPlane": {
           "!type": "fn(optionalTarget: +THREE.Plane) -> +THREE.Plane",
           "!doc": "Return a [page:Plane plane] based on the triangle. Optionally sets a target plane."
         },
@@ -4669,11 +4621,7 @@
     "WebGLRenderTargetCube": {
       "!url": "http://threejs.org/docs/#Reference/renderers/WebGLRenderTargetCube",
       "prototype": {
-        "!proto": "THREE.WebGLRenderTarget.prototype",
-        "activeCubeFace": {
-          "!type": "integer",
-          "!doc": "The activeCubeFace property corresponds to a cube side (PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5) and is\n\t\tused and set internally by the [page:CubeCamera]."
-        }
+        "!proto": "THREE.WebGLRenderTarget.prototype"
       },
       "!doc": "[page:CubeCamera] uses this as its [page:WebGLRenderTarget]",
       "!type": "fn(width: number, height: number, options: object)"

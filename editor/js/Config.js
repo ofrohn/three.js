@@ -2,9 +2,13 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var Config = function ( name ) {
+var Config = function () {
+
+	var name = 'threejs-editor';
 
 	var storage = {
+		'language': 'en',
+
 		'autosave': true,
 		'theme': 'css/light.css',
 
@@ -13,8 +17,6 @@ var Config = function ( name ) {
 
 		'project/renderer': 'WebGLRenderer',
 		'project/renderer/antialias': true,
-		'project/renderer/gammaInput': false,
-		'project/renderer/gammaOutput': false,
 		'project/renderer/shadows': true,
 
 		'project/vr': false,

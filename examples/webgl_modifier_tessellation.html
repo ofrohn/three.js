@@ -4,28 +4,7 @@
 		<title>three.js webgl - modifier - tessellation</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #ffffff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-				z-index:100;
-			}
-
-			a { color: red }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
@@ -36,10 +15,9 @@
 
 		<script src="js/controls/TrackballControls.js"></script>
 
-		<script src="js/modifiers/ExplodeModifier.js"></script>
 		<script src="js/modifiers/TessellateModifier.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="js/WebGL.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexshader">
@@ -87,9 +65,15 @@
 
 		<script>
 
-		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+		if ( WEBGL.isWebGLAvailable() === false ) {
+
+			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+		}
 
 		var renderer, scene, camera, stats;
+
+		var controls;
 
 		var mesh, uniforms;
 
@@ -107,9 +91,7 @@
 		function init( font ) {
 
 			camera = new THREE.PerspectiveCamera( 40, WIDTH / HEIGHT, 1, 10000 );
-			camera.position.set( -100, 100, 200 );
-
-			controls = new THREE.TrackballControls( camera );
+			camera.position.set( - 100, 100, 200 );
 
 			scene = new THREE.Scene();
 			scene.background = new THREE.Color( 0x050505 );
@@ -128,7 +110,7 @@
 				bevelSize: 1,
 				bevelEnabled: true
 
-			});
+			} );
 
 			geometry.center();
 
@@ -140,14 +122,11 @@
 
 			}
 
-			var explodeModifier = new THREE.ExplodeModifier();
-			explodeModifier.modify( geometry );
-
-			var numFaces = geometry.faces.length;
-
 			//
 
 			geometry = new THREE.BufferGeometry().fromGeometry( geometry );
+
+			var numFaces = geometry.attributes.position.count / 3;
 
 			var colors = new Float32Array( numFaces * 3 * 3 );
 			var displacement = new Float32Array( numFaces * 3 * 3 );
@@ -168,11 +147,11 @@
 
 				for ( var i = 0; i < 3; i ++ ) {
 
-					colors[ index + ( 3 * i )     ] = color.r;
+					colors[ index + ( 3 * i ) ] = color.r;
 					colors[ index + ( 3 * i ) + 1 ] = color.g;
 					colors[ index + ( 3 * i ) + 2 ] = color.b;
 
-					displacement[ index + ( 3 * i )     ] = d;
+					displacement[ index + ( 3 * i ) ] = d;
 					displacement[ index + ( 3 * i ) + 1 ] = d;
 					displacement[ index + ( 3 * i ) + 2 ] = d;
 
@@ -193,11 +172,11 @@
 
 			var shaderMaterial = new THREE.ShaderMaterial( {
 
-				uniforms:       uniforms,
-				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
+				uniforms: uniforms,
+				vertexShader: document.getElementById( 'vertexshader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentshader' ).textContent
 
-			});
+			} );
 
 			//
 
@@ -211,6 +190,8 @@
 
 			var container = document.getElementById( 'container' );
 			container.appendChild( renderer.domElement );
+
+			controls = new THREE.TrackballControls( camera, renderer.domElement );
 
 			stats = new Stats();
 			container.appendChild( stats.dom );

@@ -1,11 +1,3 @@
-<<<<<<< Updated upstream
-import { Vector3 } from '../math/Vector3';
-import { Object3D } from '../core/Object3D';
-import { Line } from '../objects/Line';
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { LineBasicMaterial } from '../materials/LineBasicMaterial';
-=======
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author mrdoob / http://mrdoob.com/
@@ -18,13 +10,6 @@ import { Line } from '../objects/Line.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
->>>>>>> Stashed changes
-
-/**
- * @author alteredq / http://alteredqualia.com/
- * @author mrdoob / http://mrdoob.com/
- * @author WestLangley / http://github.com/WestLangley
- */
 
 function DirectionalLightHelper( light, size, color ) {
 
@@ -88,7 +73,7 @@ DirectionalLightHelper.prototype.update = function () {
 		v2.setFromMatrixPosition( this.light.target.matrixWorld );
 		v3.subVectors( v2, v1 );
 
-		this.lightPlane.lookAt( v3 );
+		this.lightPlane.lookAt( v2 );
 
 		if ( this.color !== undefined ) {
 
@@ -102,7 +87,7 @@ DirectionalLightHelper.prototype.update = function () {
 
 		}
 
-		this.targetLine.lookAt( v3 );
+		this.targetLine.lookAt( v2 );
 		this.targetLine.scale.z = v3.length();
 
 	};

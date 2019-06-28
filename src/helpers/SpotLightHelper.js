@@ -1,11 +1,3 @@
-<<<<<<< Updated upstream
-import { Vector3 } from '../math/Vector3';
-import { Object3D } from '../core/Object3D';
-import { LineSegments } from '../objects/LineSegments';
-import { LineBasicMaterial } from '../materials/LineBasicMaterial';
-import { Float32BufferAttribute } from '../core/BufferAttribute';
-import { BufferGeometry } from '../core/BufferGeometry';
-=======
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author mrdoob / http://mrdoob.com/
@@ -18,13 +10,6 @@ import { LineSegments } from '../objects/LineSegments.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
->>>>>>> Stashed changes
-
-/**
- * @author alteredq / http://alteredqualia.com/
- * @author mrdoob / http://mrdoob.com/
- * @author WestLangley / http://github.com/WestLangley
-*/
 
 function SpotLightHelper( light, color ) {
 
@@ -84,7 +69,6 @@ SpotLightHelper.prototype.dispose = function () {
 SpotLightHelper.prototype.update = function () {
 
 	var vector = new Vector3();
-	var vector2 = new Vector3();
 
 	return function update() {
 
@@ -95,10 +79,9 @@ SpotLightHelper.prototype.update = function () {
 
 		this.cone.scale.set( coneWidth, coneWidth, coneLength );
 
-		vector.setFromMatrixPosition( this.light.matrixWorld );
-		vector2.setFromMatrixPosition( this.light.target.matrixWorld );
+		vector.setFromMatrixPosition( this.light.target.matrixWorld );
 
-		this.cone.lookAt( vector2.sub( vector ) );
+		this.cone.lookAt( vector );
 
 		if ( this.color !== undefined ) {
 

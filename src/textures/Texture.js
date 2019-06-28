@@ -4,20 +4,22 @@
  * @author szimek / https://github.com/szimek/
  */
 
-<<<<<<< Updated upstream
-import { EventDispatcher } from '../core/EventDispatcher';
-import { UVMapping } from '../constants';
-import { MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, LinearEncoding, UnsignedByteType, RGBAFormat, LinearMipMapLinearFilter, LinearFilter } from '../constants';
-import { _Math } from '../math/Math';
-import { Vector2 } from '../math/Vector2';
-=======
 import { EventDispatcher } from '../core/EventDispatcher.js';
-import { UVMapping } from '../constants.js';
-import { MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, LinearEncoding, UnsignedByteType, RGBAFormat, LinearMipMapLinearFilter, LinearFilter } from '../constants.js';
+import {
+	MirroredRepeatWrapping,
+	ClampToEdgeWrapping,
+	RepeatWrapping,
+	LinearEncoding,
+	UnsignedByteType,
+	RGBAFormat,
+	LinearMipMapLinearFilter,
+	LinearFilter,
+	UVMapping
+} from '../constants.js';
 import { _Math } from '../math/Math.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Matrix3 } from '../math/Matrix3.js';
->>>>>>> Stashed changes
+import { ImageUtils } from '../extras/ImageUtils.js';
 
 var textureId = 0;
 
@@ -49,7 +51,9 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 	this.repeat = new Vector2( 1, 1 );
 	this.center = new Vector2( 0, 0 );
 	this.rotation = 0;
-	this.center = new Vector2( 0, 0 );
+
+	this.matrixAutoUpdate = true;
+	this.matrix = new Matrix3();
 
 	this.generateMipmaps = true;
 	this.premultiplyAlpha = false;
@@ -59,7 +63,7 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 	// Values of encoding !== THREE.LinearEncoding only supported on map, envMap and emissiveMap.
 	//
 	// Also changing the encoding after already used by a Material will not automatically make the Material
-	// update.  You need to explicitly call Material.needsUpdate to trigger it to recompile.
+	// update. You need to explicitly call Material.needsUpdate to trigger it to recompile.
 	this.encoding = encoding !== undefined ? encoding : LinearEncoding;
 
 	this.version = 0;
@@ -75,6 +79,12 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 	constructor: Texture,
 
 	isTexture: true,
+
+	updateMatrix: function () {
+
+		this.matrix.setUvTransform( this.offset.x, this.offset.y, this.repeat.x, this.repeat.y, this.rotation, this.center.x, this.center.y );
+
+	},
 
 	clone: function () {
 
@@ -106,7 +116,9 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 		this.repeat.copy( source.repeat );
 		this.center.copy( source.center );
 		this.rotation = source.rotation;
-		this.center.copy( source.center );
+
+		this.matrixAutoUpdate = source.matrixAutoUpdate;
+		this.matrix.copy( source.matrix );
 
 		this.generateMipmaps = source.generateMipmaps;
 		this.premultiplyAlpha = source.premultiplyAlpha;
@@ -128,47 +140,8 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 		}
 
-		function getDataURL( image ) {
-
-			var canvas;
-
-			if ( image instanceof HTMLCanvasElement ) {
-
-				canvas = image;
-
-			} else {
-
-				canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
-				canvas.width = image.width;
-				canvas.height = image.height;
-
-				var context = canvas.getContext( '2d' );
-
-				if ( image instanceof ImageData ) {
-
-					context.putImageData( image, 0, 0 );
-
-				} else {
-
-					context.drawImage( image, 0, 0, image.width, image.height );
-
-				}
-
-			}
-
-			if ( canvas.width > 2048 || canvas.height > 2048 ) {
-
-				return canvas.toDataURL( 'image/jpeg', 0.6 );
-
-			} else {
-
-				return canvas.toDataURL( 'image/png' );
-
-			}
-
-		}
-
 		var output = {
+
 			metadata: {
 				version: 4.5,
 				type: 'Texture',
@@ -184,14 +157,22 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 			offset: [ this.offset.x, this.offset.y ],
 			center: [ this.center.x, this.center.y ],
 			rotation: this.rotation,
-			center: [ this.center.x, this.center.y ],
+
 			wrap: [ this.wrapS, this.wrapT ],
+
+			format: this.format,
+			type: this.type,
+			encoding: this.encoding,
 
 			minFilter: this.minFilter,
 			magFilter: this.magFilter,
 			anisotropy: this.anisotropy,
 
-			flipY: this.flipY
+			flipY: this.flipY,
+
+			premultiplyAlpha: this.premultiplyAlpha,
+			unpackAlignment: this.unpackAlignment
+
 		};
 
 		if ( this.image !== undefined ) {
@@ -208,9 +189,31 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 			if ( ! isRootObject && meta.images[ image.uuid ] === undefined ) {
 
+				var url;
+
+				if ( Array.isArray( image ) ) {
+
+					// process array of images e.g. CubeTexture
+
+					url = [];
+
+					for ( var i = 0, l = image.length; i < l; i ++ ) {
+
+						url.push( ImageUtils.getDataURL( image[ i ] ) );
+
+					}
+
+				} else {
+
+					// process single image
+
+					url = ImageUtils.getDataURL( image );
+
+				}
+
 				meta.images[ image.uuid ] = {
 					uuid: image.uuid,
-					url: getDataURL( image )
+					url: url
 				};
 
 			}
@@ -237,10 +240,9 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 	transformUv: function ( uv ) {
 
-		if ( this.mapping !== UVMapping ) return;
+		if ( this.mapping !== UVMapping ) return uv;
 
-		uv.multiply( this.repeat );
-		uv.add( this.offset );
+		uv.applyMatrix3( this.matrix );
 
 		if ( uv.x < 0 || uv.x > 1 ) {
 
@@ -309,6 +311,8 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 			uv.y = 1 - uv.y;
 
 		}
+
+		return uv;
 
 	}
 
